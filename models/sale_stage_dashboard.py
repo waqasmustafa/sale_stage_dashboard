@@ -51,18 +51,27 @@ class SaleStageDashboard(models.TransientModel):
         })
         return res
 
-    def action_refresh(self):
-        """Reload the dashboard with fresh data."""
-        new = self.env['sale.stage.dashboard'].create({})
+    def _get_form_action(self):
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Dashboard',
             'res_model': 'sale.stage.dashboard',
-            'res_id': new.id,
+            'res_id': self.id,
             'view_mode': 'form',
-            'view_type': 'form',
+            'view_id': self.env.ref('sale_stage_dashboard.view_sale_stage_dashboard_form').id,
             'target': 'current',
         }
+
+    @api.model
+    def action_open_dashboard(self):
+        """Create a saved dashboard record so line buttons work immediately."""
+        dashboard = self.create({})
+        return dashboard._get_form_action()
+
+    def action_refresh(self):
+        """Reload the dashboard with fresh data."""
+        return self.env['sale.stage.dashboard'].create({})._get_form_action()
 
 
 class SaleStageDashboardLine(models.TransientModel):

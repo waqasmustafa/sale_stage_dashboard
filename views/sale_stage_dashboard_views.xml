@@ -77,13 +77,11 @@
     <!-- ============================================================
          Action: Open Dashboard
     ============================================================ -->
-    <record id="action_sale_stage_dashboard" model="ir.actions.act_window">
+    <record id="action_sale_stage_dashboard" model="ir.actions.server">
         <field name="name">Dashboard</field>
-        <field name="res_model">sale.stage.dashboard</field>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_sale_stage_dashboard_form"/>
-        <field name="target">current</field>
-        <field name="context">{}</field>
+        <field name="model_id" ref="model_sale_stage_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_dashboard()</field>
     </record>
 
 </odoo>
