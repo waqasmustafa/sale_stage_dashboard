@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaleStageDashboard(models.TransientModel):
@@ -28,28 +29,42 @@ class SaleStageDashboard(models.TransientModel):
         'sale.stage.dashboard.line', 'dashboard_id', string='Stage Lines', readonly=True
     )
 
+    def _local_to_utc(self, local_datetime):
+        """Convert a naive local datetime to UTC datetime for database querying."""
+        return fields.Datetime.context_timestamp(self, local_datetime)
+
     def _get_period_bounds(self):
         self.ensure_one()
-        today = date.today()
+        today = fields.Date.context_today(self)
+
+        def date_to_start_utc(d):
+            """Convert date to start of day in UTC."""
+            naive_local = datetime.combine(d, datetime.min.time())
+            return self._local_to_utc(naive_local)
+
+        def date_to_end_utc(d):
+            """Convert date to end of day in UTC."""
+            naive_local = datetime.combine(d, datetime.max.time())
+            return self._local_to_utc(naive_local)
 
         if self.date_filter == 'today':
             return (
-                datetime.combine(today, datetime.min.time()),
-                datetime.combine(today, datetime.max.time()),
+                date_to_start_utc(today),
+                date_to_end_utc(today),
                 _('Today'),
             )
         if self.date_filter == 'week':
             start_date = today - timedelta(days=6)
             return (
-                datetime.combine(start_date, datetime.min.time()),
-                datetime.combine(today, datetime.max.time()),
+                date_to_start_utc(start_date),
+                date_to_end_utc(today),
                 _('Last 7 Days'),
             )
         if self.date_filter == 'month':
             start_date = today - timedelta(days=29)
             return (
-                datetime.combine(start_date, datetime.min.time()),
-                datetime.combine(today, datetime.max.time()),
+                date_to_start_utc(start_date),
+                date_to_end_utc(today),
                 _('Last 30 Days'),
             )
         if self.date_filter == 'custom':
@@ -58,8 +73,8 @@ class SaleStageDashboard(models.TransientModel):
             if self.date_from > self.date_to:
                 raise UserError(_('The From date must be before the To date.'))
             return (
-                datetime.combine(self.date_from, datetime.min.time()),
-                datetime.combine(self.date_to, datetime.max.time()),
+                date_to_start_utc(self.date_from),
+                date_to_end_utc(self.date_to),
                 '%s - %s' % (self.date_from, self.date_to),
             )
         return None, None, _('All Time')
