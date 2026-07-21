@@ -8,11 +8,18 @@
         <field name="name">sale.stage.dashboard.form</field>
         <field name="model">sale.stage.dashboard</field>
         <field name="arch" type="xml">
-            <form string="Order Stage Dashboard" create="false" edit="false">
+            <form string="Order Stage Dashboard" create="false">
                 <header>
+                    <field name="date_filter" widget="selection"/>
+                    <field name="date_from"
+                           invisible="date_filter != 'custom'"
+                           required="date_filter == 'custom'"/>
+                    <field name="date_to"
+                           invisible="date_filter != 'custom'"
+                           required="date_filter == 'custom'"/>
                     <button name="action_refresh"
                             type="object"
-                            string="🔄 Refresh"
+                            string="Apply / Refresh"
                             class="btn-primary"/>
                 </header>
                 <sheet>
@@ -22,7 +29,7 @@
                             <div class="o_stat_info text-center p-3"
                                  style="background:#1b75bb;color:#fff;border-radius:8px;">
                                 <span class="o_stat_value" style="font-size:2rem;font-weight:700;">
-                                    <field name="total_orders" nolabel="1"/>
+                                    <field name="total_orders" nolabel="1" readonly="1"/>
                                 </span>
                                 <br/>
                                 <span class="o_stat_text" style="font-size:1rem;">Total Orders (All Time)</span>
@@ -32,10 +39,14 @@
                             <div class="o_stat_info text-center p-3"
                                  style="background:#2e7d32;color:#fff;border-radius:8px;">
                                 <span class="o_stat_value" style="font-size:2rem;font-weight:700;">
-                                    <field name="total_today" nolabel="1"/>
+                                    <field name="total_period" nolabel="1" readonly="1"/>
                                 </span>
                                 <br/>
-                                <span class="o_stat_text" style="font-size:1rem;">Total Orders (Today)</span>
+                                <span class="o_stat_text" style="font-size:1rem;">
+                                    Total Orders (
+                                    <field name="period_label" nolabel="1" readonly="1" class="oe_inline"/>
+                                    )
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -58,13 +69,13 @@
                                     icon="fa-external-link"
                                     title="View All Orders for this Stage"
                                     class="btn-link"/>
-                            <field name="today_count"
-                                   string="Today"
+                            <field name="period_count"
+                                   string="Filtered Period"
                                    class="text-center fw-bold"/>
-                            <button name="action_open_today_orders"
+                            <button name="action_open_period_orders"
                                     type="object"
                                     icon="fa-external-link"
-                                    title="View Today's Orders for this Stage"
+                                    title="View Orders for Selected Period"
                                     class="btn-link"/>
                         </list>
                     </field>

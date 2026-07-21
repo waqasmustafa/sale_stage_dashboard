@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Stage Dashboard',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'summary': 'Dashboard showing Sale Order counts per stage (All Time & Today)',
     'description': """
 Sale Order Stage Dashboard
