@@ -77,6 +77,7 @@
     <!-- ============================================================
          Action: Open Dashboard
     ============================================================ -->
+    <delete model="ir.actions.act_window" id="action_sale_stage_dashboard"/>
     <record id="action_sale_stage_dashboard" model="ir.actions.server">
         <field name="name">Dashboard</field>
         <field name="model_id" ref="model_sale_stage_dashboard"/>
