@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_sale_stage_dashboard"
+        name="Dashboard"
+        parent="sale.sale_menu_root"
+        action="sale_stage_dashboard.action_sale_stage_dashboard"
+        sequence="82"/>
+</odoo>

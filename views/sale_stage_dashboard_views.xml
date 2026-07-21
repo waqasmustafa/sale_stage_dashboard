@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Dashboard Form View
+    ============================================================ -->
+    <record id="view_sale_stage_dashboard_form" model="ir.ui.view">
+        <field name="name">sale.stage.dashboard.form</field>
+        <field name="model">sale.stage.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Order Stage Dashboard" create="false" edit="false">
+                <header>
+                    <button name="action_refresh"
+                            type="object"
+                            string="🔄 Refresh"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <!-- ── Summary Banner ── -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="o_stat_info text-center p-3"
+                                 style="background:#1b75bb;color:#fff;border-radius:8px;">
+                                <span class="o_stat_value" style="font-size:2rem;font-weight:700;">
+                                    <field name="total_orders" nolabel="1"/>
+                                </span>
+                                <br/>
+                                <span class="o_stat_text" style="font-size:1rem;">Total Orders (All Time)</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="o_stat_info text-center p-3"
+                                 style="background:#2e7d32;color:#fff;border-radius:8px;">
+                                <span class="o_stat_value" style="font-size:2rem;font-weight:700;">
+                                    <field name="total_today" nolabel="1"/>
+                                </span>
+                                <br/>
+                                <span class="o_stat_text" style="font-size:1rem;">Total Orders (Today)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Stage Lines ── -->
+                    <field name="line_ids" nolabel="1" readonly="1">
+                        <list string="Stage Summary"
+                              create="0"
+                              delete="0"
+                              editable="0"
+                              decoration-danger="is_cancel"
+                              decoration-warning="is_urgent">
+                            <field name="stage_name" string="Order Stage" width="200px"/>
+                            <field name="is_urgent" column_invisible="1"/>
+                            <field name="is_cancel" column_invisible="1"/>
+                            <field name="total_count"
+                                   string="All Time"
+                                   class="text-center fw-bold"/>
+                            <button name="action_open_all_orders"
+                                    type="object"
+                                    icon="fa-external-link"
+                                    title="View All Orders for this Stage"
+                                    class="btn-link"/>
+                            <field name="today_count"
+                                   string="Today"
+                                   class="text-center fw-bold"/>
+                            <button name="action_open_today_orders"
+                                    type="object"
+                                    icon="fa-external-link"
+                                    title="View Today's Orders for this Stage"
+                                    class="btn-link"/>
+                        </list>
+                    </field>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Action: Open Dashboard
+    ============================================================ -->
+    <record id="action_sale_stage_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">sale.stage.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sale_stage_dashboard_form"/>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
