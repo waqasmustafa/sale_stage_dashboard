@@ -1,6 +1,6 @@
 {
     'name': 'Sale Order Stage Dashboard',
-    'version': '18.0.1.1.0',
+    'version': '19.0.1.1.0',
     'summary': 'Dashboard showing Sale Order counts per stage (All Time & Today)',
     'description': """
 Sale Order Stage Dashboard
@@ -16,7 +16,7 @@ Features:
 - Accessible from the Sales menu
     """,
     'category': 'Sales',
-    'author': 'Custom Development',
+    'author': 'WaQas Mustafa',
     'depends': ['sale_management', 'sale_order_stage_management'],
     'data': [
         'security/ir.model.access.csv',
