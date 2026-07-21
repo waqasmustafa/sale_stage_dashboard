@@ -66,8 +66,8 @@ class SaleStageDashboard(models.TransientModel):
             )
         if self.date_filter == 'week':
             start_date = today - timedelta(days=6)
-            start, _ = self._local_date_to_utc_range(start_date)
-            _, end = self._local_date_to_utc_range(today)
+            start, __dummy_end = self._local_date_to_utc_range(start_date)
+            __dummy_start, end = self._local_date_to_utc_range(today)
             return (
                 start,
                 end,
@@ -75,8 +75,8 @@ class SaleStageDashboard(models.TransientModel):
             )
         if self.date_filter == 'month':
             start_date = today - timedelta(days=29)
-            start, _ = self._local_date_to_utc_range(start_date)
-            _, end = self._local_date_to_utc_range(today)
+            start, __dummy_end = self._local_date_to_utc_range(start_date)
+            __dummy_start, end = self._local_date_to_utc_range(today)
             return (
                 start,
                 end,
@@ -87,8 +87,8 @@ class SaleStageDashboard(models.TransientModel):
                 raise UserError(_('Please select both From and To dates for a custom range.'))
             if self.date_from > self.date_to:
                 raise UserError(_('The From date must be before the To date.'))
-            start, _ = self._local_date_to_utc_range(self.date_from)
-            _, end = self._local_date_to_utc_range(self.date_to)
+            start, __dummy_end = self._local_date_to_utc_range(self.date_from)
+            __dummy_start, end = self._local_date_to_utc_range(self.date_to)
             return (
                 start,
                 end,
