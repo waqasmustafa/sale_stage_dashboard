@@ -1,8 +1,9 @@
 from datetime import date, datetime, timedelta
 
+import pytz
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaleStageDashboard(models.TransientModel):
@@ -29,42 +30,56 @@ class SaleStageDashboard(models.TransientModel):
         'sale.stage.dashboard.line', 'dashboard_id', string='Stage Lines', readonly=True
     )
 
-    def _local_to_utc(self, local_datetime):
-        """Convert a naive local datetime to UTC datetime for database querying."""
-        return fields.Datetime.context_timestamp(self, local_datetime)
+    def _get_user_tz(self):
+        """Get the user's timezone, default to UTC."""
+        tz_name = self.env.context.get('tz') or self.env.user.tz or 'UTC'
+        return pytz.timezone(tz_name)
+
+    def _local_date_to_utc_range(self, local_date):
+        """Convert a local date to UTC datetime range (start and end of day)."""
+        tz = self._get_user_tz()
+        
+        # Create naive local datetime for start and end of day
+        local_start = datetime.combine(local_date, datetime.min.time())
+        local_end = datetime.combine(local_date, datetime.max.time())
+        
+        # Make them timezone-aware in the user's timezone
+        aware_local_start = tz.localize(local_start, is_dst=None)
+        aware_local_end = tz.localize(local_end, is_dst=None)
+        
+        # Convert to UTC
+        utc_start = aware_local_start.astimezone(pytz.UTC).replace(tzinfo=None)
+        utc_end = aware_local_end.astimezone(pytz.UTC).replace(tzinfo=None)
+        
+        return utc_start, utc_end
 
     def _get_period_bounds(self):
         self.ensure_one()
         today = fields.Date.context_today(self)
 
-        def date_to_start_utc(d):
-            """Convert date to start of day in UTC."""
-            naive_local = datetime.combine(d, datetime.min.time())
-            return self._local_to_utc(naive_local)
-
-        def date_to_end_utc(d):
-            """Convert date to end of day in UTC."""
-            naive_local = datetime.combine(d, datetime.max.time())
-            return self._local_to_utc(naive_local)
-
         if self.date_filter == 'today':
+            start, end = self._local_date_to_utc_range(today)
             return (
-                date_to_start_utc(today),
-                date_to_end_utc(today),
+                start,
+                end,
                 _('Today'),
             )
         if self.date_filter == 'week':
             start_date = today - timedelta(days=6)
+            start, _ = self._local_date_to_utc_range(start_date)
+            _, end = self._local_date_to_utc_range(today)
             return (
-                date_to_start_utc(start_date),
-                date_to_end_utc(today),
+                start,
+                end,
                 _('Last 7 Days'),
             )
         if self.date_filter == 'month':
             start_date = today - timedelta(days=29)
+            start, _ = self._local_date_to_utc_range(start_date)
+            _, end = self._local_date_to_utc_range(today)
             return (
-                date_to_start_utc(start_date),
-                date_to_end_utc(today),
+                start,
+                end,
                 _('Last 30 Days'),
             )
         if self.date_filter == 'custom':
@@ -72,9 +87,11 @@ class SaleStageDashboard(models.TransientModel):
                 raise UserError(_('Please select both From and To dates for a custom range.'))
             if self.date_from > self.date_to:
                 raise UserError(_('The From date must be before the To date.'))
+            start, _ = self._local_date_to_utc_range(self.date_from)
+            _, end = self._local_date_to_utc_range(self.date_to)
             return (
-                date_to_start_utc(self.date_from),
-                date_to_end_utc(self.date_to),
+                start,
+                end,
                 '%s - %s' % (self.date_from, self.date_to),
             )
         return None, None, _('All Time')
