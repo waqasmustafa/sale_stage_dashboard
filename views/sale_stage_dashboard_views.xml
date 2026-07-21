@@ -22,7 +22,6 @@
                             string="Apply / Refresh"
                             class="btn-primary"/>
                 </header>
-                <sheet>
                     <!-- ── Summary Banner ── -->
                     <div class="row mb-4">
                         <div class="col-6">
@@ -79,8 +78,6 @@
                                     class="btn-link"/>
                         </list>
                     </field>
-
-                </sheet>
             </form>
         </field>
     </record>
